@@ -685,7 +685,7 @@ def select(query, nodes, deep=False, roots=False):
     return Result(children=top)
 
 
-def from_dict(orig):
+def from_dict(orig, src=None):
     """
     from_dict is a helper function that does its best to convert a python dict
     into a tree of :py:class:`Entry` instances that can be queried.
@@ -694,20 +694,20 @@ def from_dict(orig):
         result = []
         for k, v in d.items():
             if isinstance(v, dict):
-                result.append(Entry(name=k, children=inner(v)))
+                result.append(Entry(name=k, children=inner(v), src=src))
             elif isinstance(v, list):
-                res = [Entry(name=k, children=inner(i)) if isinstance(i, dict) else i for i in v]
+                res = [Entry(name=k, children=inner(i), src=src) if isinstance(i, dict) else i for i in v]
                 if res:
                     if isinstance(res[0], Entry):
                         result.extend(res)
                     else:
-                        result.append(Entry(name=k, attrs=res))
+                        result.append(Entry(name=k, attrs=res, src=src))
                 else:
-                    result.append(Entry(name=k, attrs=[]))
+                    result.append(Entry(name=k, attrs=[], src=src))
             else:
-                result.append(Entry(name=k, attrs=[v]))
+                result.append(Entry(name=k, attrs=[v], src=src))
         return result
-    return Entry(children=inner(orig))
+    return Entry(children=inner(orig), src=src)
 
 
 def pretty_format(root, indent=4):
